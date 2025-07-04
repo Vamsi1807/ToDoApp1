@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App with AI</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+  <h1>Todo App with AI Assistant</h1>
+
+  <div class="sections">
+    <div class="todo-section">
+      <h2>Add New Todo</h2>
+      <form id="todoForm">
+        <input type="text" id="todoInput" placeholder="Enter your todo..." required>
+        <div class="datetime-picker">
+          <input type="date" id="dueDate" placeholder="Due date">
+          <input type="time" id="dueTime" placeholder="Due time">
+        </div>
+        <div class="form-buttons">
+          <button type="submit">Add Todo</button>
+          <button type="button" id="getSuggestionsBtn">Get AI Suggestions</button>
+        </div>
+      </form>
+
+      <div id="suggestionsContainer" class="hidden">
+        <h3>AI Suggestions:</h3>
+        <ul id="suggestionsList"></ul>
+      </div>
+
+      <h2>Your Todos</h2>
+      <div class="todo-actions">
+        <button id="deleteCompletedBtn">Delete Completed Tasks!!</button>
+      </div>
+      <ul id="todoList"></ul>
+    </div>
+
+    <div class="chat-section">
+      <h2>AI Assistant</h2>
+      <div id="chatContainer">
+        <div id="chatMessages"></div>
+        <form id="chatForm">
+          <input type="text" id="chatInput" placeholder="Ask the AI for help...">
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
