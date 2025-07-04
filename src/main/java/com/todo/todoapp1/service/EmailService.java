@@ -9,16 +9,14 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private JavaMailSender emailSender;
 
-    // Sends a simple email
-    public void sendSimpleEmail(String toEmail, String subject, String body) {
+    public void sendReminderEmail(String toEmail, String todoDescription) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("your-email@example.com");
         message.setTo(toEmail);
-        message.setSubject(subject);
-        message.setText(body);
-        mailSender.send(message);
-        System.out.println("Email sent to " + toEmail + " with subject: " + subject);
+        message.setSubject("Todo Reminder: Task Due in 1 Hour");
+        message.setText("Reminder: Your todo item '" + todoDescription + "' is due in 1 hour!");
+        System.out.println("email sent to "+toEmail+" !!");
+        emailSender.send(message);
     }
 }

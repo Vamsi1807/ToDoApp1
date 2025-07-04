@@ -1,9 +1,13 @@
+
 package com.todo.todoapp1.controller;
 
 import com.todo.todoapp1.model.TodoItem;
+import com.todo.todoapp1.model.User;
 import com.todo.todoapp1.service.TodoService;
+import com.todo.todoapp1.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,58 +20,73 @@ public class TodoController {
     @Autowired
     private TodoService todoService;
 
+    @Autowired
+    private UserService userService;
+
+    // Get all todos for the current user
     @GetMapping
-    public List<TodoItem> getAllTodos() {
-        return todoService.getAllTodoItems();
+    public ResponseEntity<List<TodoItem>> getAllTodos(Authentication authentication) {
+        User user = userService.findByUsername(authentication.getName());
+        return ResponseEntity.ok(todoService.getTodosByUser(user));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TodoItem> getTodoById(@PathVariable Long id) {
-        return todoService.getTodoItemById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public TodoItem createTodo(@RequestBody TodoItem todoItem) {
-        return todoService.saveTodoItem(todoItem);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<TodoItem> updateTodo(@PathVariable Long id, @RequestBody TodoItem todoItemDetails) {
-        return todoService.getTodoItemById(id)
-                .map(todoItem -> {
-                    todoItem.setDescription(todoItemDetails.getDescription());
-                    todoItem.setDueDate(todoItemDetails.getDueDate());
-                    todoItem.setCompleted(todoItemDetails.isCompleted());
-                    TodoItem updatedTodo = todoService.saveTodoItem(todoItem);
-                    return ResponseEntity.ok(updatedTodo);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTodo(@PathVariable Long id) {
-        return todoService.getTodoItemById(id)
-                .map(todoItem -> {
-                    todoService.deleteTodoItem(id);
-                    return ResponseEntity.ok().<Void>build();
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/suggestions")
-    public String getAiSuggestions() {
-        return todoService.getAiSuggestionsForTodos();
-    }
-
+    // Add a new todo with AI suggestions
     @PostMapping("/with-suggestions")
-    public ResponseEntity<?> createTodoWithSuggestions(@RequestBody TodoItem todoItem) {
-        TodoItem savedItem = todoService.saveTodoItem(todoItem);
-        String suggestions = todoService.getAiSuggestionsForTodos();
-        return ResponseEntity.ok(Map.of(
-                "todo", savedItem,
-                "suggestions", suggestions
-        ));
+    public ResponseEntity<?> addTodoWithSuggestions(
+            @RequestBody TodoItem todo,
+            Authentication authentication) {
+        try {
+            User user = userService.findByUsername(authentication.getName());
+            TodoItem savedTodo = todoService.addTodoItem(todo, user);
+
+            // You can add AI suggestions logic here if needed
+            return ResponseEntity.ok(Map.of(
+                    "todo", savedTodo,
+                    "suggestions", "[]" // Replace with actual suggestions if implementing AI features
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Delete a specific todo
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTodo(
+            @PathVariable Long id,
+            Authentication authentication) {
+        try {
+            User user = userService.findByUsername(authentication.getName());
+            todoService.deleteTodoItem(id, user);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Update a todo's completion status
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTodo(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> updates,
+            Authentication authentication) {
+        try {
+            User user = userService.findByUsername(authentication.getName());
+            TodoItem updated = todoService.updateTodoItem(id, updates.get("completed"), user);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Delete all completed todos for the current user
+    @DeleteMapping("/completed")
+    public ResponseEntity<?> deleteCompleted(Authentication authentication) {
+        try {
+            User user = userService.findByUsername(authentication.getName());
+            todoService.deleteCompletedTodos(user);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

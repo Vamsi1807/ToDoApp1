@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<!-- Rest of your existing index.html content -->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,14 @@
 </head>
 <body>
 <div class="container">
-  <h1>Todo App with AI Assistant</h1>
+
+  <div class="header">
+    <h1>Todo App with AI Assistant</h1>
+    <form th:action="@{/logout}" method="post" style="float: right;">
+      <button type="submit" class="logout-btn">Logout</button>
+    </form>
+  </div>
+
 
   <div class="sections">
     <div class="todo-section">
