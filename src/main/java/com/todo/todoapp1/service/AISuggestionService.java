@@ -22,7 +22,7 @@ public class AISuggestionService {
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
     // Changed to a more free-tier friendly and efficient model
-    private String currentGeminiModel = "gemini-1.5-flash-latest"; // MODIFIED LINE
+    private String currentGeminiModel = "gemini-2.5-flash"; // MODIFIED LINE
 
     public AISuggestionService() {
         this.httpClient = HttpClient.newBuilder()
